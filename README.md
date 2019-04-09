@@ -1,6 +1,6 @@
 # text_gcn.pytorch
 
-This project implements [Graph Convolutional Networks for Text Classification. Yao et al. AAAI2019.](https://arxiv.org/abs/1809.05679) in PyTorch.
+This project implements ["Graph Convolutional Networks for Text Classification. Yao et al. AAAI2019."](https://arxiv.org/abs/1809.05679) in PyTorch.
 
 This implementation highly based on official code [yao8839836/text_gcn](<https://github.com/yao8839836/text_gcn>).
 
