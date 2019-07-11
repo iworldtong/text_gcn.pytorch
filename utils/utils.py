@@ -55,7 +55,7 @@ def load_data(dataset_str):
     test_idx_reorder = parse_index_file(
         "data/ind.{}.test.index".format(dataset_str))
     test_idx_range = np.sort(test_idx_reorder)
-    print(x.shape, y.shape, tx.shape, ty.shape, allx.shape, ally.shape)
+    print_log(x.shape, y.shape, tx.shape, ty.shape, allx.shape, ally.shape)
 
     # training nodes are training docs, no initial features
     # print("x: ", x)
@@ -239,7 +239,7 @@ def construct_feed_dict(features, support, labels, labels_mask, placeholders):
 
 def chebyshev_polynomials(adj, k):
     """Calculate Chebyshev polynomials up to order k. Return a list of sparse matrices (tuple representation)."""
-    print("Calculating Chebyshev polynomials up to order {}...".format(k))
+    print_log("Calculating Chebyshev polynomials up to order {}...".format(k))
 
     adj_normalized = normalize_adj(adj)
     laplacian = sp.eye(adj.shape[0]) - adj_normalized
@@ -248,8 +248,10 @@ def chebyshev_polynomials(adj, k):
         2. / largest_eigval[0]) * laplacian - sp.eye(adj.shape[0])
 
     t_k = list()
-    t_k.append(sp.eye(adj.shape[0]))
-    t_k.append(scaled_laplacian)
+    # t_k.append(sp.eye(adj.shape[0]))
+    # t_k.append(scaled_laplacian)
+    t_k.append(sp.eye(adj.shape[0]).A)
+    t_k.append(scaled_laplacian.A)
 
     def chebyshev_recurrence(t_k_minus_one, t_k_minus_two, scaled_lap):
         s_lap = sp.csr_matrix(scaled_lap, copy=True)
@@ -258,7 +260,8 @@ def chebyshev_polynomials(adj, k):
     for i in range(2, k+1):
         t_k.append(chebyshev_recurrence(t_k[-1], t_k[-2], scaled_laplacian))
 
-    return sparse_to_tuple(t_k)
+    # return sparse_to_tuple(t_k)
+    return t_k
 
 
 def loadWord2Vec(filename):
@@ -277,7 +280,7 @@ def loadWord2Vec(filename):
                 vector[i] = float(vector[i])
             embd.append(vector)
             word_vector_map[row[0]] = vector
-    print('Loaded Word Vectors!')
+    print_log('Loaded Word Vectors!')
     file.close()
     return vocab, embd, word_vector_map
 

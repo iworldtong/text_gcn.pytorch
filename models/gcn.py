@@ -42,6 +42,7 @@ class GraphConvolution(nn.Module):
         if self.act_func is not None:
             out = self.act_func(out)
 
+        self.embedding = out
         return out
 
 

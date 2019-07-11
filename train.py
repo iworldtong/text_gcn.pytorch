@@ -31,6 +31,7 @@ cfg.dataset = dataset
 
 # Set random seed
 seed = random.randint(1, 200)
+seed = 2019
 np.random.seed(seed)
 torch.manual_seed(seed)
 if torch.cuda.is_available():
@@ -46,13 +47,6 @@ adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, train_si
 
 features = sp.identity(features.shape[0])  # featureless
 
-# print(adj)
-# print(adj[0], adj[1])
-# print(adj.shape)
-# print(train_mask.shape)
-# print(y_train.shape)
-# print(type(y_train))
-# os._exit(0)
 
 # Some preprocessing
 features = preprocess_features(features)
@@ -70,6 +64,7 @@ elif cfg.model == 'dense':
     model_func = MLP
 else:
     raise ValueError('Invalid argument for model: ' + str(cfg.model))
+
 
 # Define placeholders
 t_features = torch.from_numpy(features)
@@ -107,7 +102,7 @@ def evaluate(features, labels, mask):
         pred = torch.max(logits, 1)[1]
         acc = ((pred == torch.max(labels, 1)[1]).float() * t_mask).sum().item() / t_mask.sum().item()
         
-    return loss, acc, pred, labels.numpy(), (time.time() - t_test)
+    return loss.numpy(), acc, pred.numpy(), labels.numpy(), (time.time() - t_test)
 
 
 
@@ -127,8 +122,6 @@ for epoch in range(cfg.epochs):
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
-
-    
 
     # Validation
     val_loss, val_acc, pred, labels, duration = evaluate(t_features, t_y_val, val_mask)
@@ -154,61 +147,63 @@ test_labels = []
 for i in range(len(test_mask)):
     if test_mask[i]:
         test_pred.append(pred[i])
-        test_labels.append(labels[i])
-
-# print_log("Test Precision, Recall and F1-Score...")
-# print_log(metrics.classification_report(test_labels, test_pred, digits=4))
-# print_log("Macro average Test Precision, Recall and F1-Score...")
-# print_log(metrics.precision_recall_fscore_support(test_labels, test_pred, average='macro'))
-# print_log("Micro average Test Precision, Recall and F1-Score...")
-# print_log(metrics.precision_recall_fscore_support(test_labels, test_pred, average='micro'))
-
-# # doc and word embeddings
-# word_embeddings = outs[3][train_size: adj.shape[0] - test_size]
-# train_doc_embeddings = outs[3][:train_size]  # include val docs
-# test_doc_embeddings = outs[3][adj.shape[0] - test_size:]
-
-# print_log('Embeddings:')
-# print_log('\rWord_embeddings:'+str(len(word_embeddings)))
-# print_log('\rTrain_doc_embeddings:'+str(len(train_doc_embeddings))) 
-# print_log('\rTest_doc_embeddings:'+str(len(test_doc_embeddings))) 
-# print_log('\rWord_embeddings:') 
-# print(word_embeddings)
-
-# with open('./data/corpus/' + dataset + '_vocab.txt', 'r') as f:
-#     words = f.readlines()
-
-# vocab_size = len(words)
-# word_vectors = []
-# for i in range(vocab_size):
-#     word = words[i].strip()
-#     word_vector = word_embeddings[i]
-#     word_vector_str = ' '.join([str(x) for x in word_vector])
-#     word_vectors.append(word + ' ' + word_vector_str)
-
-# word_embeddings_str = '\n'.join(word_vectors)
-# with open('./data/' + dataset + '_word_vectors.txt', 'w') as f:
-#     f.write(word_embeddings_str)
+        test_labels.append(np.argmax(labels[i]))
 
 
+print_log("Test Precision, Recall and F1-Score...")
+print_log(metrics.classification_report(test_labels, test_pred, digits=4))
+print_log("Macro average Test Precision, Recall and F1-Score...")
+print_log(metrics.precision_recall_fscore_support(test_labels, test_pred, average='macro'))
+print_log("Micro average Test Precision, Recall and F1-Score...")
+print_log(metrics.precision_recall_fscore_support(test_labels, test_pred, average='micro'))
 
-# doc_vectors = []
-# doc_id = 0
-# for i in range(train_size):
-#     doc_vector = train_doc_embeddings[i]
-#     doc_vector_str = ' '.join([str(x) for x in doc_vector])
-#     doc_vectors.append('doc_' + str(doc_id) + ' ' + doc_vector_str)
-#     doc_id += 1
+# doc and word embeddings
+tmp = model.layer1.embedding.numpy()
+word_embeddings = tmp[train_size: adj.shape[0] - test_size]
+train_doc_embeddings = tmp[:train_size]  # include val docs
+test_doc_embeddings = tmp[adj.shape[0] - test_size:]
 
-# for i in range(test_size):
-#     doc_vector = test_doc_embeddings[i]
-#     doc_vector_str = ' '.join([str(x) for x in doc_vector])
-#     doc_vectors.append('doc_' + str(doc_id) + ' ' + doc_vector_str)
-#     doc_id += 1
+print_log('Embeddings:')
+print_log('\rWord_embeddings:'+str(len(word_embeddings)))
+print_log('\rTrain_doc_embeddings:'+str(len(train_doc_embeddings))) 
+print_log('\rTest_doc_embeddings:'+str(len(test_doc_embeddings))) 
+print_log('\rWord_embeddings:') 
+print_log(word_embeddings)
 
-# doc_embeddings_str = '\n'.join(doc_vectors)
-# with open('./data/' + dataset + '_doc_vectors.txt', 'w') as f:
-#     f.write(doc_embeddings_str)
+with open('./data/corpus/' + dataset + '_vocab.txt', 'r') as f:
+    words = f.readlines()
+
+vocab_size = len(words)
+word_vectors = []
+for i in range(vocab_size):
+    word = words[i].strip()
+    word_vector = word_embeddings[i]
+    word_vector_str = ' '.join([str(x) for x in word_vector])
+    word_vectors.append(word + ' ' + word_vector_str)
+
+word_embeddings_str = '\n'.join(word_vectors)
+with open('./data/' + dataset + '_word_vectors.txt', 'w') as f:
+    f.write(word_embeddings_str)
+
+
+
+doc_vectors = []
+doc_id = 0
+for i in range(train_size):
+    doc_vector = train_doc_embeddings[i]
+    doc_vector_str = ' '.join([str(x) for x in doc_vector])
+    doc_vectors.append('doc_' + str(doc_id) + ' ' + doc_vector_str)
+    doc_id += 1
+
+for i in range(test_size):
+    doc_vector = test_doc_embeddings[i]
+    doc_vector_str = ' '.join([str(x) for x in doc_vector])
+    doc_vectors.append('doc_' + str(doc_id) + ' ' + doc_vector_str)
+    doc_id += 1
+
+doc_embeddings_str = '\n'.join(doc_vectors)
+with open('./data/' + dataset + '_doc_vectors.txt', 'w') as f:
+    f.write(doc_embeddings_str)
 
 
 
