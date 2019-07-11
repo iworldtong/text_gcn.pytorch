@@ -55,8 +55,7 @@ for i, f in enumerate(fea_num):
         plt.scatter(f[:, 0], f[:, 1], label=cls[i], marker='+')
     else:
         plt.scatter(f[:, 0], f[:, 1], label=cls[i])
-# plt.legend(ncol=2,  )
-# plt.legend(ncol=5,loc='upper center',bbox_to_anchor=(0.48, -0.08),fontsize=11)
+plt.legend(ncol=5, loc='upper center', bbox_to_anchor=(0.48, -0.08), fontsize=11)
 # plt.ylim([-20,35])
 # plt.title(md_file)
 plt.tight_layout()

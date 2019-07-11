@@ -34,12 +34,12 @@ seed = random.randint(1, 200)
 seed = 2019
 np.random.seed(seed)
 torch.manual_seed(seed)
-if torch.cuda.is_available():
-    torch.cuda.manual_seed(seed)
+# if torch.cuda.is_available():
+#     torch.cuda.manual_seed(seed)
 
 
 # Settings
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+# os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Load data
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, train_size, test_size = load_corpus(
@@ -78,7 +78,17 @@ t_support = []
 for i in range(len(support)):
     t_support.append(torch.Tensor(support[i]))
 
-
+if torch.cuda.is_available():
+    model_func = model_func.cuda()
+    t_features = t_features.cuda()
+    t_y_train = t_y_train.cuda()
+    t_y_val = t_y_val.cuda()
+    t_y_test = t_y_test.cuda()
+    t_train_mask = t_train_mask.cuda()
+    tm_train_mask = tm_train_mask.cuda()
+    for i in range(len(support)):
+        t_support = [t.cuda() for t in t_support if True]
+        
 model = model_func(input_dim=features.shape[0], support=t_support, num_classes=y_train.shape[1])
 
 
