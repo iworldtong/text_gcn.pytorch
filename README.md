@@ -23,6 +23,6 @@ This implementation highly based on official code [yao8839836/text_gcn](<https:/
 ### R8
 
 <div align="center">    
-<img src="./src/R8_gcn_test.png" width="500px" height="400px" alt="R8_gcn_test" align=center />
+<img src="https://github.com/iworldtong/text_gcn.pytorch/blob/master/src/R8_gcn_test.png?raw=true" width="500px" height="400px" alt="R8_gcn_test" align=center />
 </div>
 
