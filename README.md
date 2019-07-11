@@ -19,10 +19,11 @@ This implementation highly based on official code [yao8839836/text_gcn](<https:/
 5. Run `python train.py <dataset>`
 6. Replace `<dataset>` with `20ng`, `R8`, `R52`, `ohsumed` or `mr`
 
-# Reproducing Results
-
-None.
-
 # Visualization
 
-#### 
+### R8
+
+<div align="center">    
+<img src="./src/R8_gcn_test.png" width="500px" height="400px" alt="R8_gcn_test" align=center />
+</div>
+
