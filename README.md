@@ -8,7 +8,6 @@ This implementation highly based on official code [yao8839836/text_gcn](<https:/
 
 * Python 3.6
 * PyTorch 1.0
-* CPU | GPU supported.
 
 # Running training and evaluation
 
