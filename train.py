@@ -178,7 +178,7 @@ print_log('\rWord_embeddings:'+str(len(word_embeddings)))
 print_log('\rTrain_doc_embeddings:'+str(len(train_doc_embeddings))) 
 print_log('\rTest_doc_embeddings:'+str(len(test_doc_embeddings))) 
 print_log('\rWord_embeddings:') 
-print_log(word_embeddings)
+print(word_embeddings)
 
 with open('./data/corpus/' + dataset + '_vocab.txt', 'r') as f:
     words = f.readlines()
